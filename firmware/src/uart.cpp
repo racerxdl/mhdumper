@@ -5,8 +5,8 @@ extern "C" {
 #include "air105_otp.h"
 #include "air105_spi.h"
 #include "delay.h"
-#include "sysc.h"
 #include "irq.h"
+#include "sysc.h"
 }
 
 #include <cstdio>
@@ -58,23 +58,18 @@ void SerialSend(uint8_t* buf, uint16_t len) {
 uint8_t tmpRX = 0;
 
 // UART0 interrupt handler
-void UART0_IRQHandler(void)
-{
-	volatile uint32_t iir;
+void UART0_IRQHandler(void) {
+    volatile uint32_t iir;
 
-	UART_TypeDef * UARTx = UART0;
+    UART_TypeDef* UARTx = UART0;
 
-	iir = UART_GetITIdentity(UARTx);
-	switch (iir & 0x0f)
-	{
-	case UART_IT_ID_RX_RECVD:
-		{
-			tmpRX = UART_ReceiveData(UARTx);
-			push(tmpRX);
-		}
-		break;
-	default:
-		break;
-
-	}
+    iir = UART_GetITIdentity(UARTx);
+    switch (iir & 0x0f) {
+        case UART_IT_ID_RX_RECVD: {
+            tmpRX = UART_ReceiveData(UARTx);
+            push(tmpRX);
+        } break;
+        default:
+            break;
+    }
 }

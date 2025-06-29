@@ -4,9 +4,9 @@ extern "C" {
 #include "irq.h"
 }
 
-#include <cstdio>
-
 #include <setjmp.h>
+
+#include <cstdio>
 // Global jump buffer for memory fault recovery
 static jmp_buf error_recovery_buf;
 static jmp_buf* error_jmp_buf_ptr = &error_recovery_buf;
@@ -20,7 +20,7 @@ void MemManage_Handler(void) {
     if (error_jmp_buf_ptr) {
         longjmp(*error_jmp_buf_ptr, 1);
     }
-    while(1);
+    while (1);
 }
 
 void BusFault_Handler(void) {
@@ -28,7 +28,7 @@ void BusFault_Handler(void) {
     if (error_jmp_buf_ptr) {
         longjmp(*error_jmp_buf_ptr, 1);
     }
-    while(1);
+    while (1);
 }
 
 void UsageFault_Handler(void) {
@@ -36,9 +36,8 @@ void UsageFault_Handler(void) {
     if (error_jmp_buf_ptr) {
         longjmp(*error_jmp_buf_ptr, 1);
     }
-    while(1);
+    while (1);
 }
-
 
 // Safe memory reading function
 bool SafeMemoryRead(uint32_t address, uint8_t* buffer, uint32_t length) {

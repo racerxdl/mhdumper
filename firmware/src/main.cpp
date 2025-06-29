@@ -1,15 +1,15 @@
 #include <stdio.h>
 
 extern "C" {
-    #include "air105.h"
-    #include "air105_otp.h"
-    #include "air105_spi.h"
-    #include "delay.h"
-    #include "sysc.h"
+#include "air105.h"
+#include "air105_otp.h"
+#include "air105_spi.h"
+#include "delay.h"
+#include "sysc.h"
 }
 
-#include "uart.h"
 #include "fault.h"
+#include "uart.h"
 
 #define BUFF_SIZE 5000
 
@@ -45,20 +45,19 @@ uint16_t currentPos = 0;
 uint8_t tmpBuffer[4];
 uint32_t lastPacketByteTick = 0;
 
-const uint32_t PacketTimeout = 100; // 100ms
-
+const uint32_t PacketTimeout = 100;  // 100ms
 
 void SendPacket(const Packet &packet) {
     uint16_t packetSize = sizeof(packet.magic) + sizeof(packet.header) + sizeof(packet.length) + packet.length;
-    SerialSend((uint8_t*)&packet, packetSize);
+    SerialSend((uint8_t *)&packet, packetSize);
 }
 
 void SendMessageBack(const char *message) {
     Packet packet;
     packet.header = PACKET_MESSAGE_RESPONSE;
-    packet.length = strlen(message)+1; // +1 for null terminator
+    packet.length = strlen(message) + 1;  // +1 for null terminator
     if (packet.length >= BUFF_SIZE) {
-        packet.length = BUFF_SIZE-1;
+        packet.length = BUFF_SIZE - 1;
     }
     memcpy(packet.data, message, packet.length);
 
@@ -94,7 +93,7 @@ void TryReceivePacket() {
 
     // Read the header + length
     currentPos = 0;
-    while (currentPos < 3) { // PackeType + length
+    while (currentPos < 3) {  // PackeType + length
         if (!SerialIsRXEmpty()) {
             tmpBuffer[currentPos] = SerialGetByte();
             currentPos++;
@@ -183,9 +182,9 @@ int main(void) {
     SYSCTRL->CG_CTRL1 = SYSCTRL_APBPeriph_ALL;
     SYSCTRL->CG_CTRL2 = SYSCTRL_AHBPeriph_ALL;
 
-    GPIO_PinRemapConfig(GPIOA, GPIO_Pin_0 | GPIO_Pin_1,GPIO_Remap_0);
-	SYSCTRL_APBPeriphClockCmd(SYSCTRL_APBPeriph_UART0, ENABLE);
-	SYSCTRL_APBPeriphResetCmd(SYSCTRL_APBPeriph_UART0, ENABLE);
+    GPIO_PinRemapConfig(GPIOA, GPIO_Pin_0 | GPIO_Pin_1, GPIO_Remap_0);
+    SYSCTRL_APBPeriphClockCmd(SYSCTRL_APBPeriph_UART0, ENABLE);
+    SYSCTRL_APBPeriphResetCmd(SYSCTRL_APBPeriph_UART0, ENABLE);
 
     UART_InitTypeDef uart_init;
     uart_init.UART_BaudRate = 115200;
@@ -196,13 +195,13 @@ int main(void) {
     UART_ITConfig(UART0, UART_IT_RX_RECVD, ENABLE);
     NVIC_InitTypeDef NVIC_InitStructure;
 
-	NVIC_InitStructure.NVIC_IRQChannel = UART0_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 2;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStructure);
+    NVIC_InitStructure.NVIC_IRQChannel = UART0_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 2;
+    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&NVIC_InitStructure);
 
-    Delay_ms(1000); // Wait for a bit
+    Delay_ms(1000);  // Wait for a bit
     SendMessageBack("MHROMDUMPER Firmware v1.0");
 
     // Main loop
